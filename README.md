@@ -1,84 +1,81 @@
-# MyPackage
+# OpenAI
 
-A template repository for creating a Toit package.
+A OpenAI client for Toit.
 
-## Toit package
-Use `toit.pkg describe` or `toit pkg describe` (depending on which Toit
-variant you use) to see how https://pkg.toit.io will extract package
-information from your repo when you publish the package.
+## Key
+Get an API key from https://platform.openai.com/account/api-keys.
 
-Either add a `name: ...` entry to the package.yaml or change the title
-(first line) of this README to the package name.
+We recommend to provide the key through an environment variable on
+desktop machines and through a separate main-file on microcontrollers.
 
-Either add a `description: ...` entry to the package.yaml or ensure
-that the first paragraph of this README can be used as a description.
+For Example, you would have a file `esp32.toit` which imports the `main.toit`
+file and provides the API key.
 
-## Structure
-Code that should be used by other developers must live in the `src` folder.
+Typically you would have an `esp32-example.toit` file which looks like this:
+```toit
+import .main as real_main
 
-Examples should live in `examples`. For bigger examples, or examples that
-use more packages, create a subfolder.
+KEY ::= "YOUR API KEY"
 
-Tests live in the `tests` folder.
-
-## Copyright
-Don't forget to update the copyright holder in the license files.
-There are (up to) three license files:
-- `LICENSE`: usually MIT
-- `examples/EXAMPLES_LICENSE`: usually BSD0
-- `tests/TESTS_LICENSE`: usually BSD0
-
-We recommend to use the following Copyright header in `src` files (with your
-copyright):
-
+main args:
+  real_main.main args --key=KEY
 ```
-// Copyright (C) 2022 Jane/John Doe
-// Use of this source code is governed by an MIT-style license that can be
-// found in the package's LICENSE file.
+Check this file in.
+
+Locally, make a copy of this file (as `esp32.toit) and insert your API key.
+Mark the `esp32.toit` file as ignored in your `.gitignore` file.
+
+## Examples
+
+``` toit
+import openai show *
+
+main args/List --key/string:
+  prompt := "This is a test"
+  if args.size > 0: prompt = args[0]
+
+  client := Client --key=key
+
+  response := client.complete --prompt=prompt --stop=["."]
+  print "response: $response"
+
+  conversation := [
+     ChatMessage.system "You are a helpful assistant.",
+     ChatMessage.user "Help we write an API for an OpenAI client.",
+     ChatMessage.user "The language is Toit.",
+     ChatMessage.user """
+       Example for the Usage class:
+       ```
+        class Usage:
+        /**
+        The number of tokens in the prompt.
+        */
+        prompt_tokens/int
+
+        /**
+        The number of tokens in the completion.
+        */
+        completion_tokens/int?
+
+        /**
+        The total number of tokens in the prompt and completion.
+        */
+        total_tokens/int
+
+        constructor.from_json json/Map:
+            prompt_tokens = json["prompt_tokens"]
+            completion_tokens = json.get "completion_tokens"
+            total_tokens = json["total_tokens"]
+
+       ```
+       """,
+  ]
+  response := client.complete_chat --conversation=conversation --max_tokens=1000
+  print "response: $response"
 ```
 
-Similarly, you can use the following header for tests and examples:
-```
-// Copyright (C) 2022 Jane/John Doe
-// Use of this source code is governed by a Zero-Clause BSD license that can
-// be found in the tests/TESTS_LICENSE file.
-```
-and
-```
-// Copyright (C) 2022 Jane/John Doe
-// Use of this source code is governed by a Zero-Clause BSD license that can
-// be found in the examples/EXAMPLES_LICENSE file.
-```
+## Features and bugs
+Please file feature requests and bugs at the [issue tracker](https://github.com/toitware/toit-openai/issues).
 
-## Local package
-Examples and tests can have different dependencies than the package. This is,
-why they have their own package.yaml/package.lock.
-
-Open the examples (resp. tests) folder with a separate instance of your IDE.
-For vscode you could just write `code examples`.
-
-Install this package as a local package.
-```
-cd examples
-toit.pkg install --local --name=YOUR_PACKAGE_NAME ..
-```
-
-This installs the package located at ".." (here the root of the repository) with
-your package name.
-
-Consequently examples and tests can import the package as if it was installed
-from the Internet. This way, tests and examples use the same syntax as
-users of the package.
-
-## Publish
-Make sure to run `toit.pkg describe` to verify that the data is correct.
-
-This repository comes with a `.github/workflows/publish.xml` file which automatically
-publishes the Toit package for every release. You can just draft a new release on
-Github.
-It is important that the release has a semver tag (like `v1.2.3`).
-
-Alternatively, a package can be published by hand:
-0. Ensure that everything looks good (`toit.pkg describe`).
-1. Add a semver tag (like `v1.0.0`).
-2. Go to https://pkg.toit.io/publish and submit your package.
+## References
+- [OpenAI OpenAPI](https://github.com/openai/openai-openapi/blob/master/openapi.yaml)
