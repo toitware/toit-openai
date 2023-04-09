@@ -8,10 +8,10 @@ Get an API key from https://platform.openai.com/account/api-keys.
 We recommend to provide the key through an environment variable on
 desktop machines and through a separate main-file on microcontrollers.
 
-For Example, you would have a file `esp32.toit` which imports the `main.toit`
+For example, you would have a file `esp32.toit` which imports the `main.toit`
 file and provides the API key.
 
-Typically you would have an `esp32-example.toit` file which looks like this:
+Typically your `esp32.toit` file would look like this:
 ```toit
 import .main as real_main
 
@@ -22,7 +22,7 @@ main args:
 ```
 Check this file in.
 
-Locally, make a copy of this file (as `esp32.toit) and insert your API key.
+Locally, make a copy of this file (as `esp32.toit`) and insert your API key.
 Mark the `esp32.toit` file as ignored in your `.gitignore` file.
 
 ## Examples
