@@ -8,6 +8,10 @@ import http
 import net
 
 OPENAI_HOST ::= "api.openai.com"
+DEFAULT_COMPLETION_MODEL ::= "davinci"
+DEFAULT_CHAT_MODEL ::= "gpt-3.5-turbo"
+DEFAULT_COMPLETION_MAX_TOKENS ::= 50
+DEFAULT_CHAT_MAX_TOKENS ::= 50
 
 /**
 A client for the OpenAI API.
@@ -18,14 +22,44 @@ class Client:
   client_/http.Client? := ?
   models_/Models? := null
   headers_/http.Headers? := null
+  completion_model_/string
+  completion_max_tokens_/int
+  chat_model_/string
+  chat_max_tokens_/int
 
   /**
   Constructs a new client with the given $key.
 
+  The $completion_model is the default model to use for completions. It
+    can also be changed by specifying the 'model' parameter in the
+    $complete method. It defaults to $DEFAULT_COMPLETION_MODEL.
+
+  The $completion_max_tokens is the default number of tokens to generate
+    for completions. It can also be changed by specifying the 'max_tokens'
+    parameter in the $complete method. It defaults to
+    $DEFAULT_COMPLETION_MAX_TOKENS.
+
+  The $chat_model is the default model to use for chat completions. It
+    can also be changed by specifying the 'model' parameter in the
+    $complete_chat method. It defaults to $DEFAULT_CHAT_MODEL.
+
+  The $chat_max_tokens is the default number of tokens to generate
+    for chat completions. It can also be changed by specifying the 'max_tokens'
+    parameter in the $complete_chat method. It defaults to
+    $DEFAULT_CHAT_MAX_TOKENS.
+
   Keys are managed here: https://platform.openai.com/account/api-keys.
   */
-  constructor --key/string:
+  constructor --key/string
+      --completion_model=DEFAULT_COMPLETION_MODEL
+      --completion_max_tokens=DEFAULT_COMPLETION_MAX_TOKENS
+      --chat_model=DEFAULT_CHAT_MODEL
+      --chat_max_tokens=DEFAULT_CHAT_MAX_TOKENS:
     key_ = key
+    completion_model_ = completion_model
+    completion_max_tokens_ = completion_max_tokens
+    chat_model_ = chat_model
+    chat_max_tokens_ = chat_max_tokens
     network_ = net.open
     client_ = http.Client.tls network_
         --root_certificates=[certificate_roots.BALTIMORE_CYBERTRUST_ROOT]
@@ -41,7 +75,11 @@ class Client:
   /**
   Completes the given $prompt with the given $model.
 
-  Use $max_tokens to limit the number of tokens generated.
+  The $model defaults to the one specified at construction of this instance.
+
+  Use $max_tokens to limit the number of tokens generated. It defaults to
+    the one specified at construction of this instance.
+
   Use $stop to specify a list of tokens that will stop the completion.
 
   Returns the generated text.
@@ -55,7 +93,11 @@ class Client:
   print text
   ```
   */
-  complete --prompt/string --model="davinci" --max_tokens=50 --stop/List?=null -> string:
+  complete -> string
+      --prompt/string
+      --model=completion_model_
+      --max_tokens=completion_max_tokens_
+      --stop/List?=null:
     request := CompletionRequest
         --model=model
         --prompt=prompt
@@ -75,7 +117,11 @@ class Client:
   /**
   Completes the given $conversation with the given $model.
 
-  Use $max_tokens to limit the number of tokens generated.
+  The $model defaults to the one specified at construction of this instance.
+
+  Use $max_tokens to limit the number of tokens generated. It defaults to
+    the one specified at construction of this instance.
+
   Use $stop to specify a list of tokens that will stop the completion.
 
   Returns the generated text.
@@ -93,7 +139,11 @@ class Client:
   print text
   ```
   */
-  complete_chat --conversation/List --model="gpt-3.5-turbo" --max_tokens=50 --stop/List?=null -> string:
+  complete_chat -> string
+      --conversation/List
+      --model=chat_model_
+      --max_tokens=chat_max_tokens_
+      --stop/List?=null:
     request := ChatCompletionRequest
         --model=model
         --messages=conversation
