@@ -48,13 +48,20 @@ class Client:
     parameter in the $complete_chat method. It defaults to
     $DEFAULT_CHAT_MAX_TOKENS.
 
+  If $install_common_trusted_roots is set (the default), installs all common
+    trusted roots. If this flag is set to false, install the roots manually
+    before using the client.
+
   Keys are managed here: https://platform.openai.com/account/api-keys.
   */
   constructor --key/string
-      --completion_model=DEFAULT_COMPLETION_MODEL
-      --completion_max_tokens=DEFAULT_COMPLETION_MAX_TOKENS
-      --chat_model=DEFAULT_CHAT_MODEL
-      --chat_max_tokens=DEFAULT_CHAT_MAX_TOKENS:
+      --completion_model/string=DEFAULT_COMPLETION_MODEL
+      --completion_max_tokens/int=DEFAULT_COMPLETION_MAX_TOKENS
+      --chat_model/string=DEFAULT_CHAT_MODEL
+      --chat_max_tokens/int=DEFAULT_CHAT_MAX_TOKENS
+      --install_common_trusted_roots/bool=true:
+    if install_common_trusted_roots:
+      certificate_roots.install_common_trusted_roots
     key_ = key
     completion_model_ = completion_model
     completion_max_tokens_ = completion_max_tokens
@@ -62,7 +69,6 @@ class Client:
     chat_max_tokens_ = chat_max_tokens
     network_ = net.open
     client_ = http.Client.tls network_
-        --root_certificates=[certificate_roots.BALTIMORE_CYBERTRUST_ROOT]
 
   close:
     if client_:
@@ -86,7 +92,9 @@ class Client:
 
   This is a shorthand version of $(complete request).
 
-  Example:
+  Deprecated. OpenAI has deprecated this endpoint.
+
+  # Examples
   ```
   client := Client --key=OPENAI_KEY
   text := client.complete --prompt="The quick brown fox jumps over the lazy "
