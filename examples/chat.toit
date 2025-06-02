@@ -19,5 +19,5 @@ main args/List --key/string:
     ChatMessage.system "You are a helpful assistant.",
     ChatMessage.user "Give me a surprising fact about animals that we frequently encounter.",
   ]
-  response := client.complete_chat --conversation=conversation --max_tokens=100
+  response := client.complete-chat --conversation=conversation --max-tokens=100
   print "response: $response"

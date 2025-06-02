@@ -50,22 +50,22 @@ main args/List --key/string:
         /**
         The number of tokens in the prompt.
         */
-        prompt_tokens/int
+        prompt-tokens/int
 
         /**
         The number of tokens in the completion.
         */
-        completion_tokens/int?
+        completion-tokens/int?
 
         /**
         The total number of tokens in the prompt and completion.
         */
-        total_tokens/int
+        total-tokens/int
 
-        constructor.from_json json/Map:
-            prompt_tokens = json["prompt_tokens"]
-            completion_tokens = json.get "completion_tokens"
-            total_tokens = json["total_tokens"]
+        constructor.from-json json/Map:
+            prompt-tokens = json["prompt_tokens"]
+            completion-tokens = json.get "completion_tokens"
+            total-tokens = json["total_tokens"]
 
        ```
        """,

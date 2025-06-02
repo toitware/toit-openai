@@ -2,16 +2,16 @@
 // Use of this source code is governed by a MIT-style license that can be found
 // in the LICENSE file.
 
-import certificate_roots
+import certificate-roots
 import encoding.json
 import http
 import net
 
-OPENAI_HOST ::= "api.openai.com"
-DEFAULT_COMPLETION_MODEL ::= "davinci"
-DEFAULT_CHAT_MODEL ::= "gpt-3.5-turbo"
-DEFAULT_COMPLETION_MAX_TOKENS ::= 50
-DEFAULT_CHAT_MAX_TOKENS ::= 50
+OPENAI-HOST ::= "api.openai.com"
+DEFAULT-COMPLETION-MODEL ::= "davinci"
+DEFAULT-CHAT-MODEL ::= "gpt-3.5-turbo"
+DEFAULT-COMPLETION-MAX-TOKENS ::= 50
+DEFAULT-CHAT-MAX-TOKENS ::= 50
 
 /**
 A client for the OpenAI API.
@@ -22,51 +22,51 @@ class Client:
   client_/http.Client? := ?
   models_/Models? := null
   headers_/http.Headers? := null
-  completion_model_/string
-  completion_max_tokens_/int
-  chat_model_/string
-  chat_max_tokens_/int
+  completion-model_/string
+  completion-max-tokens_/int
+  chat-model_/string
+  chat-max-tokens_/int
 
   /**
   Constructs a new client with the given $key.
 
-  The $completion_model is the default model to use for completions. It
+  The $completion-model is the default model to use for completions. It
     can also be changed by specifying the 'model' parameter in the
-    $complete method. It defaults to $DEFAULT_COMPLETION_MODEL.
+    $complete method. It defaults to $DEFAULT-COMPLETION-MODEL.
 
-  The $completion_max_tokens is the default number of tokens to generate
+  The $completion-max-tokens is the default number of tokens to generate
     for completions. It can also be changed by specifying the 'max_tokens'
     parameter in the $complete method. It defaults to
-    $DEFAULT_COMPLETION_MAX_TOKENS.
+    $DEFAULT-COMPLETION-MAX-TOKENS.
 
-  The $chat_model is the default model to use for chat completions. It
+  The $chat-model is the default model to use for chat completions. It
     can also be changed by specifying the 'model' parameter in the
-    $complete_chat method. It defaults to $DEFAULT_CHAT_MODEL.
+    $complete-chat method. It defaults to $DEFAULT-CHAT-MODEL.
 
-  The $chat_max_tokens is the default number of tokens to generate
+  The $chat-max-tokens is the default number of tokens to generate
     for chat completions. It can also be changed by specifying the 'max_tokens'
-    parameter in the $complete_chat method. It defaults to
-    $DEFAULT_CHAT_MAX_TOKENS.
+    parameter in the $complete-chat method. It defaults to
+    $DEFAULT-CHAT-MAX-TOKENS.
 
-  If $install_common_trusted_roots is set (the default), installs all common
+  If $install-common-trusted-roots is set (the default), installs all common
     trusted roots. If this flag is set to false, install the roots manually
     before using the client.
 
   Keys are managed here: https://platform.openai.com/account/api-keys.
   */
   constructor --key/string
-      --completion_model/string=DEFAULT_COMPLETION_MODEL
-      --completion_max_tokens/int=DEFAULT_COMPLETION_MAX_TOKENS
-      --chat_model/string=DEFAULT_CHAT_MODEL
-      --chat_max_tokens/int=DEFAULT_CHAT_MAX_TOKENS
-      --install_common_trusted_roots/bool=true:
-    if install_common_trusted_roots:
-      certificate_roots.install_common_trusted_roots
+      --completion-model/string=DEFAULT-COMPLETION-MODEL
+      --completion-max-tokens/int=DEFAULT-COMPLETION-MAX-TOKENS
+      --chat-model/string=DEFAULT-CHAT-MODEL
+      --chat-max-tokens/int=DEFAULT-CHAT-MAX-TOKENS
+      --install-common-trusted-roots/bool=true:
+    if install-common-trusted-roots:
+      certificate-roots.install-common-trusted-roots
     key_ = key
-    completion_model_ = completion_model
-    completion_max_tokens_ = completion_max_tokens
-    chat_model_ = chat_model
-    chat_max_tokens_ = chat_max_tokens
+    completion-model_ = completion-model
+    completion-max-tokens_ = completion-max-tokens
+    chat-model_ = chat-model
+    chat-max-tokens_ = chat-max-tokens
     network_ = net.open
     client_ = http.Client.tls network_
 
@@ -83,7 +83,7 @@ class Client:
 
   The $model defaults to the one specified at construction of this instance.
 
-  Use $max_tokens to limit the number of tokens generated. It defaults to
+  Use $max-tokens to limit the number of tokens generated. It defaults to
     the one specified at construction of this instance.
 
   Use $stop to specify a list of tokens that will stop the completion.
@@ -103,13 +103,13 @@ class Client:
   */
   complete -> string
       --prompt/string
-      --model=completion_model_
-      --max_tokens=completion_max_tokens_
+      --model=completion-model_
+      --max-tokens=completion-max-tokens_
       --stop/List?=null:
     request := CompletionRequest
         --model=model
         --prompt=prompt
-        --max_tokens=max_tokens
+        --max-tokens=max-tokens
         --stop=stop
     completion := complete request
     choice := completion.choices[0]
@@ -119,22 +119,22 @@ class Client:
   Requests a completion for the given $request.
   */
   complete request/CompletionRequest -> Completion:
-    response := post_ "/v1/completions" request.to_json
-    return Completion.from_json response
+    response := post_ "/v1/completions" request.to-json
+    return Completion.from-json response
 
   /**
   Completes the given $conversation with the given $model.
 
   The $model defaults to the one specified at construction of this instance.
 
-  Use $max_tokens to limit the number of tokens generated. It defaults to
+  Use $max-tokens to limit the number of tokens generated. It defaults to
     the one specified at construction of this instance.
 
   Use $stop to specify a list of tokens that will stop the completion.
 
   Returns the generated text.
 
-  This is a shorthand version of $(complete_chat request).
+  This is a shorthand version of $(complete-chat request).
 
   Example:
   ```
@@ -147,26 +147,26 @@ class Client:
   print text
   ```
   */
-  complete_chat -> string
+  complete-chat -> string
       --conversation/List
-      --model=chat_model_
-      --max_tokens=chat_max_tokens_
+      --model=chat-model_
+      --max-tokens=chat-max-tokens_
       --stop/List?=null:
     request := ChatCompletionRequest
         --model=model
         --messages=conversation
-        --max_tokens=max_tokens
+        --max-tokens=max-tokens
         --stop=stop
-    completion := complete_chat request
+    completion := complete-chat request
     choice/ChatChoice := completion.choices[0]
     return choice.message.content
 
   /**
   Requests a completion for the given $request.
   */
-  complete_chat request/ChatCompletionRequest -> ChatCompletion:
-    response := post_ "/v1/chat/completions" request.to_json
-    return ChatCompletion.from_json response
+  complete-chat request/ChatCompletionRequest -> ChatCompletion:
+    response := post_ "/v1/chat/completions" request.to-json
+    return ChatCompletion.from-json response
 
   /**
   Returns the $Models object, allowing access to model-related functionality.
@@ -175,7 +175,7 @@ class Client:
     if not models_: models_ = Models this
     return models_
 
-  authorization_headers_ -> http.Headers:
+  authorization-headers_ -> http.Headers:
     // TODO(florian): switch to saved header once the http library
     // doesn't modify the header anymore.
     // if not headers_:
@@ -186,37 +186,37 @@ class Client:
     return headers_
 
   post_ path/string payload/Map  -> Map:
-    response := client_.post_json payload
-        --headers=authorization_headers_
-        --host=OPENAI_HOST
+    response := client_.post-json payload
+        --headers=authorization-headers_
+        --host=OPENAI-HOST
         --path=path
-    return decode_response_ response
+    return decode-response_ response
 
   get_ path/string -> Map:
     response := client_.get
-        --headers=authorization_headers_
-        --host=OPENAI_HOST
+        --headers=authorization-headers_
+        --host=OPENAI-HOST
         --path=path
-    return decode_response_ response
+    return decode-response_ response
 
-  decode_response_ response/http.Response -> Map:
+  decode-response_ response/http.Response -> Map:
     try:
-      if response.status_code != 200:
-        decoded_object := null
+      if response.status-code != 200:
+        decoded-object := null
         catch:
-          decoded_object = json.decode_stream response.body
-        error_object := decoded_object and decoded_object.get "error"
-        if not error_object: error_object = {:}
+          decoded-object = json.decode-stream response.body
+        error-object := decoded-object and decoded-object.get "error"
+        if not error-object: error-object = {:}
         exception := OpenAIException
-            --status_code=response.status_code
-            --status_message=response.status_message
-            --message=error_object.get "message"
-            --type=error_object.get "type"
-            --param=error_object.get "param"
-            --code=error_object.get "code"
+            --status-code=response.status-code
+            --status-message=response.status-message
+            --message=error-object.get "message"
+            --type=error-object.get "type"
+            --param=error-object.get "param"
+            --code=error-object.get "code"
         throw exception
-      response_payload := json.decode_stream response.body
-      return response_payload
+      response-payload := json.decode-stream response.body
+      return response-payload
     finally:
       // Drain the body.
       while response.body.read: null
@@ -228,18 +228,18 @@ class Model:
   id/string
   object/string
   created/int
-  owned_by/string
+  owned-by/string
   permission/List?
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     id = json["id"]
     object = json["object"]
     created = json["created"]
-    owned_by = json["owned_by"]
+    owned-by = json["owned_by"]
     permission = json.get "permission"
 
   stringify -> string:
-    return "Model: $id (owned_by $owned_by)"
+    return "Model: $id (owned_by $owned-by)"
 
 class Models:
   client_/Client
@@ -248,30 +248,30 @@ class Models:
 
   list -> List:
     response := client_.get_ "/v1/models"
-    return response["data"].map: Model.from_json it
+    return response["data"].map: Model.from-json it
 
   operator [] id/string -> Model:
     response := client_.get_ "/v1/models/$id"
-    return Model.from_json response
+    return Model.from-json response
 
 class OpenAIException:
-  status_code/int
-  status_message/string
+  status-code/int
+  status-message/string
   message/string?
   type/string?
   param/any
   code/any
 
   constructor
-      --.status_code
-      --.status_message
+      --.status-code
+      --.status-message
       --.message
       --.type
       --.param
       --.code:
 
   stringify -> string:
-    return "OpenAIException: $status_code - $status_message - $message ($type)"
+    return "OpenAIException: $status-code - $status-message - $message ($type)"
 
 class CompletionRequest:
   /**
@@ -307,7 +307,7 @@ class CompletionRequest:
 
   Default: 16
   */
-  max_tokens/int?
+  max-tokens/int?
 
   /**
   The sampling temperature.
@@ -318,7 +318,7 @@ class CompletionRequest:
   The temperature must be in the range [0.0, 2.0].
   Default: 1.0.
 
-  We generally recommend altering this or $top_p but not both.
+  We generally recommend altering this or $top-p but not both.
 
   */
   temperature/float?
@@ -327,7 +327,7 @@ class CompletionRequest:
   The probability mass cut-off.
 
   This is an alternative to sampling with temperature, called nucleus sampling, where the model
-    considers the results of the tokens with $top_p probability mass. So 0.1 means only the tokens
+    considers the results of the tokens with $top-p probability mass. So 0.1 means only the tokens
     comprising the top 10% probability mass are considered.
 
   We generally recommend altering this or $temperature but not both.
@@ -335,7 +335,7 @@ class CompletionRequest:
   The value must be in the range [0.0, 1.0].
   Default: 1.0.
   */
-  top_p/float?
+  top-p/float?
 
   /**
   How many completions to generate for each prompt.
@@ -345,7 +345,7 @@ class CompletionRequest:
 
   # Warning
   Because this parameter generates many completions, it can quickly consume your token
-    quota. Use carefully and ensure that you have reasonable settings for $max_tokens and $stop.
+    quota. Use carefully and ensure that you have reasonable settings for $max-tokens and $stop.
   */
   n/int?
 
@@ -399,7 +399,7 @@ class CompletionRequest:
 
   See https://platform.openai.com/docs/api-reference/parameter-details more information about frequency and presence penalties.
   */
-  presence_penalty/float?
+  presence-penalty/float?
 
   /**
   Penalty to apply to new tokens based on their existing frequency in the text so far.
@@ -412,7 +412,7 @@ class CompletionRequest:
 
   See https://platform.openai.com/docs/api-reference/parameter-details more information about frequency and presence penalties.
   */
-  frequency_penalty/float?
+  frequency-penalty/float?
 
   /**
   Generates `best_of` completions server-side and returns the "best" (the one with
@@ -420,17 +420,17 @@ class CompletionRequest:
 
   Results cannot be streamed.
 
-  When used with $n, $best_of controls the number of candidate completions and $n specifies
+  When used with $n, $best-of controls the number of candidate completions and $n specifies
     how many to return.
 
-  The $best_of value must be greater than $n.
+  The $best-of value must be greater than $n.
 
   # Warning
 
   Because this parameter generates many completions, it can quickly consume your token
-    quota. Use carefully and ensure that you have reasonable settings for $max_tokens and $stop.
+    quota. Use carefully and ensure that you have reasonable settings for $max-tokens and $stop.
   */
-  best_of/int?
+  best-of/int?
 
   /**
   Modifies the likelihood of the specified tokens appearing in the completion.
@@ -449,14 +449,14 @@ class CompletionRequest:
   # Example
   Use `{"50256": -100}` to prevent the '<|endoftext|>' token from being generated.
   */
-  logit_bias/Map?
+  logit-bias/Map?
 
   /**
   Whether to include the prompt in the response.
 
   Default: false.
   */
-  return_prompt/bool?
+  return-prompt/bool?
 
   /**
   A unique identifier representing the end-user.
@@ -469,40 +469,40 @@ class CompletionRequest:
   constructor
       --.model
       --.prompt=null
-      --.max_tokens=null
+      --.max-tokens=null
       --.temperature=null
-      --.top_p=null
+      --.top-p=null
       --.n=null
       --.stream=null
       --.logprobs=null
       --.echo=null
       --.stop=null
-      --.presence_penalty=null
-      --.frequency_penalty=null
-      --.best_of=null
-      --.logit_bias=null
-      --.return_prompt=null
+      --.presence-penalty=null
+      --.frequency-penalty=null
+      --.best-of=null
+      --.logit-bias=null
+      --.return-prompt=null
       --.user=null:
-    if max_tokens and max_tokens < 0: throw "INVALID_ARGUMENT"
+    if max-tokens and max-tokens < 0: throw "INVALID_ARGUMENT"
     if temperature and not 0.0 <= temperature <= 2.0: throw "INVALID_ARGUMENT"
-    if top_p and not 0.0 <= top_p <= 1.0: throw "INVALID_ARGUMENT"
+    if top-p and not 0.0 <= top-p <= 1.0: throw "INVALID_ARGUMENT"
     if n and not 1 <= n <= 128: throw "INVALID_ARGUMENT"
     // We don't test the upper bound for $logprobs, as users can get exceptions.
     if logprobs and not 0 <= logprobs: throw "INVALID_ARGUMENT"
-    if presence_penalty and not -2.0 <= presence_penalty <= 2.0: throw "INVALID_ARGUMENT"
-    if frequency_penalty and not -2.0 <= frequency_penalty <= 2.0: throw "INVALID_ARGUMENT"
+    if presence-penalty and not -2.0 <= presence-penalty <= 2.0: throw "INVALID_ARGUMENT"
+    if frequency-penalty and not -2.0 <= frequency-penalty <= 2.0: throw "INVALID_ARGUMENT"
 
   /**
   Returns a JSON representation of the request.
   */
-  to_json -> Map:
+  to-json -> Map:
     result := {
       "model": model
     }
     if prompt: result["prompt"] = prompt
-    if max_tokens: result["max_tokens"] = max_tokens
+    if max-tokens: result["max_tokens"] = max-tokens
     if temperature: result["temperature"] = temperature
-    if top_p: result["top_p"] = top_p
+    if top-p: result["top_p"] = top-p
     if n: result["n"] = n
     // 'stream' is false by default, so we don't need to test for 'null'.
     if stream: result["stream"] = stream
@@ -510,12 +510,12 @@ class CompletionRequest:
     // 'echo' is false by default, so we don't need to test for 'null'.
     if echo: result["echo"] = echo
     if stop: result["stop"] = stop
-    if presence_penalty: result["presence_penalty"] = presence_penalty
-    if frequency_penalty: result["frequency_penalty"] = frequency_penalty
-    if best_of: result["best_of"] = best_of
-    if logit_bias: result["logit_bias"] = logit_bias
+    if presence-penalty: result["presence_penalty"] = presence-penalty
+    if frequency-penalty: result["frequency_penalty"] = frequency-penalty
+    if best-of: result["best_of"] = best-of
+    if logit-bias: result["logit_bias"] = logit-bias
     // 'return_prompt' is false by default, so we don't need to test for 'null'.
-    if return_prompt: result["return_prompt"] = return_prompt
+    if return-prompt: result["return_prompt"] = return-prompt
     if user: result["user"] = user
     return result
 
@@ -551,13 +551,13 @@ class Completion:
   */
   usage/Usage?
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     id = json["id"]
     object = json["object"]
     created = json["created"]
     model = json["model"]
-    choices = json["choices"].map: Choice.from_json it
-    usage = json.contains "usage" ? Usage.from_json json["usage"]: null
+    choices = json["choices"].map: Choice.from-json it
+    usage = json.contains "usage" ? Usage.from-json json["usage"]: null
 
 class Choice:
   /**
@@ -578,16 +578,16 @@ class Choice:
   /**
   The reason the model stopped generating text.
   */
-  finish_reason/string?
+  finish-reason/string?
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     text = json["text"]
     index = json["index"]
     if json.contains "logprobs" and json["logprobs"]:
-      logprobs = json["logprobs"].map: Logprobs.from_json it
+      logprobs = json["logprobs"].map: Logprobs.from-json it
     else:
       logprobs = null
-    finish_reason = json.get "finish_reason"
+    finish-reason = json.get "finish_reason"
 
 class Logprobs:
   /**
@@ -598,44 +598,44 @@ class Logprobs:
   /**
   The log probabilities for the tokens.
   */
-  token_logprobs/List
+  token-logprobs/List
 
   /**
   The top log probabilities for the tokens.
   */
-  top_logprobs/List
+  top-logprobs/List
 
   /**
   The text offset for the tokens.
   */
-  text_offset/List
+  text-offset/List
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     tokens = json["tokens"]
-    token_logprobs = json["token_logprobs"]
-    top_logprobs = json["top_logprobs"]
-    text_offset = json["text_offset"]
+    token-logprobs = json["token_logprobs"]
+    top-logprobs = json["top_logprobs"]
+    text-offset = json["text_offset"]
 
 class Usage:
   /**
   The number of tokens in the prompt.
   */
-  prompt_tokens/int
+  prompt-tokens/int
 
   /**
   The number of tokens in the completion.
   */
-  completion_tokens/int?
+  completion-tokens/int?
 
   /**
   The total number of tokens in the prompt and completion.
   */
-  total_tokens/int
+  total-tokens/int
 
-  constructor.from_json json/Map:
-    prompt_tokens = json["prompt_tokens"]
-    completion_tokens = json.get "completion_tokens"
-    total_tokens = json["total_tokens"]
+  constructor.from-json json/Map:
+    prompt-tokens = json["prompt_tokens"]
+    completion-tokens = json.get "completion_tokens"
+    total-tokens = json["total_tokens"]
 
 class ChatCompletionRequest:
   /**
@@ -667,10 +667,10 @@ class ChatCompletionRequest:
     a way to obtain the token ids for a given text.
 
 
-  The default value for $max_tokens is equal to 4096 - prompt tokens (the maximum the
+  The default value for $max-tokens is equal to 4096 - prompt tokens (the maximum the
     model can generate).
   */
-  max_tokens/int?
+  max-tokens/int?
 
   /**
   The sampling temperature.
@@ -681,7 +681,7 @@ class ChatCompletionRequest:
   The temperature must be in the range [0.0, 2.0].
   Default: 1.0.
 
-  We generally recommend altering this or $top_p but not both.
+  We generally recommend altering this or $top-p but not both.
 
   */
   temperature/float?
@@ -690,7 +690,7 @@ class ChatCompletionRequest:
   The probability mass cut-off.
 
   This is an alternative to sampling with temperature, called nucleus sampling, where the model
-    considers the results of the tokens with $top_p probability mass. So 0.1 means only the tokens
+    considers the results of the tokens with $top-p probability mass. So 0.1 means only the tokens
     comprising the top 10% probability mass are considered.
 
   We generally recommend altering this or $temperature but not both.
@@ -698,7 +698,7 @@ class ChatCompletionRequest:
   The value must be in the range [0.0, 1.0].
   Default: 1.0.
   */
-  top_p/float?
+  top-p/float?
 
   /**
   How many completions to generate for each prompt.
@@ -708,7 +708,7 @@ class ChatCompletionRequest:
 
   # Warning
   Because this parameter generates many completions, it can quickly consume your token
-    quota. Use carefully and ensure that you have reasonable settings for $max_tokens and $stop.
+    quota. Use carefully and ensure that you have reasonable settings for $max-tokens and $stop.
   */
   n/int?
 
@@ -743,7 +743,7 @@ class ChatCompletionRequest:
 
   See https://platform.openai.com/docs/api-reference/parameter-details more information about frequency and presence penalties.
   */
-  presence_penalty/float?
+  presence-penalty/float?
 
   /**
   Penalty to apply to new tokens based on their existing frequency in the text so far.
@@ -756,7 +756,7 @@ class ChatCompletionRequest:
 
   See https://platform.openai.com/docs/api-reference/parameter-details more information about frequency and presence penalties.
   */
-  frequency_penalty/float?
+  frequency-penalty/float?
 
   /**
   Modifies the likelihood of the specified tokens appearing in the completion.
@@ -775,7 +775,7 @@ class ChatCompletionRequest:
   # Example
   Use `{"50256": -100}` to prevent the '<|endoftext|>' token from being generated.
   */
-  logit_bias/Map?
+  logit-bias/Map?
 
   /**
   A unique identifier representing the end-user.
@@ -788,37 +788,37 @@ class ChatCompletionRequest:
   constructor
       --.model
       --.messages
-      --.max_tokens=null
+      --.max-tokens=null
       --.temperature=null
-      --.top_p=null
+      --.top-p=null
       --.n=null
       --.stream=null
       --.stop=null
-      --.presence_penalty=null
-      --.frequency_penalty=null
-      --.logit_bias=null
+      --.presence-penalty=null
+      --.frequency-penalty=null
+      --.logit-bias=null
       --.user=null:
-    if max_tokens and max_tokens < 0: throw "INVALID_ARGUMENT"
+    if max-tokens and max-tokens < 0: throw "INVALID_ARGUMENT"
     if temperature and not 0.0 <= temperature <= 2.0: throw "INVALID_ARGUMENT"
-    if top_p and not 0.0 <= top_p <= 1.0: throw "INVALID_ARGUMENT"
+    if top-p and not 0.0 <= top-p <= 1.0: throw "INVALID_ARGUMENT"
     if n and not 1 <= n <= 128: throw "INVALID_ARGUMENT"
-    if presence_penalty and not -2.0 <= presence_penalty <= 2.0: throw "INVALID_ARGUMENT"
-    if frequency_penalty and not -2.0 <= frequency_penalty <= 2.0: throw "INVALID_ARGUMENT"
+    if presence-penalty and not -2.0 <= presence-penalty <= 2.0: throw "INVALID_ARGUMENT"
+    if frequency-penalty and not -2.0 <= frequency-penalty <= 2.0: throw "INVALID_ARGUMENT"
 
-  to_json -> Map:
+  to-json -> Map:
     result := {
       "model": model,
-      "messages": messages.map: it.to_json,
+      "messages": messages.map: it.to-json,
     }
-    if max_tokens: result["max_tokens"] = max_tokens
+    if max-tokens: result["max_tokens"] = max-tokens
     if temperature: result["temperature"] = temperature
-    if top_p: result["top_p"] = top_p
+    if top-p: result["top_p"] = top-p
     if n: result["n"] = n
     if stream: result["stream"] = stream
     if stop: result["stop"] = stop
-    if presence_penalty: result["presence_penalty"] = presence_penalty
-    if frequency_penalty: result["frequency_penalty"] = frequency_penalty
-    if logit_bias: result["logit_bias"] = logit_bias
+    if presence-penalty: result["presence_penalty"] = presence-penalty
+    if frequency-penalty: result["frequency_penalty"] = frequency-penalty
+    if logit-bias: result["logit_bias"] = logit-bias
     if user: result["user"] = user
     return result
 
@@ -826,14 +826,14 @@ class ChatCompletionRequest:
 A message of the chat conversation.
 */
 class ChatMessage:
-  static ROLE_SYSTEM ::= "system"
-  static ROLE_USER ::= "user"
-  static ROLE_ASSISTENT ::= "assistant"
+  static ROLE-SYSTEM ::= "system"
+  static ROLE-USER ::= "user"
+  static ROLE-ASSISTENT ::= "assistant"
 
   /**
   The role of the message.
 
-  Must be one of $ROLE_SYSTEM, $ROLE_USER, or $ROLE_ASSISTENT.
+  Must be one of $ROLE-SYSTEM, $ROLE-USER, or $ROLE-ASSISTENT.
   */
   role/string
 
@@ -848,19 +848,19 @@ class ChatMessage:
   user/string?
 
   constructor --.role --.content --.user=null:
-    if role != ChatMessage.ROLE_SYSTEM and role != ChatMessage.ROLE_USER and role != ChatMessage.ROLE_ASSISTENT:
+    if role != ChatMessage.ROLE-SYSTEM and role != ChatMessage.ROLE-USER and role != ChatMessage.ROLE-ASSISTENT:
       throw "INVALID_ARGUMENT"
 
   constructor.system content/string:
-    return ChatMessage --role=ChatMessage.ROLE_SYSTEM --content=content
+    return ChatMessage --role=ChatMessage.ROLE-SYSTEM --content=content
 
   constructor.user content/string --user/string?=null:
-    return ChatMessage --role=ChatMessage.ROLE_USER --content=content --user=user
+    return ChatMessage --role=ChatMessage.ROLE-USER --content=content --user=user
 
   constructor.assistant content/string:
-    return ChatMessage --role=ChatMessage.ROLE_ASSISTENT --content=content
+    return ChatMessage --role=ChatMessage.ROLE-ASSISTENT --content=content
 
-  to_json -> Map:
+  to-json -> Map:
     result := {
       "role": role,
       "content": content,
@@ -882,17 +882,17 @@ class ChatChoice:
   The reason the message was finished.
   Can be one of
   - 'stop': the API returned a complete model output.
-  - 'length': an incomplete output was returned due to the $ChatCompletionRequest.max_tokens limit, or
+  - 'length': an incomplete output was returned due to the $ChatCompletionRequest.max-tokens limit, or
     due to the model's token limit.
   - 'content_filter': content was omitted due to a flag from OpenAI's content filters.
   - null: the API response is still in progress or incomplete.
   */
-  finish_reason/string?
+  finish-reason/string?
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     index = json["index"]
     message = ChatMessage --role=json["message"]["role"] --content=json["message"]["content"]
-    finish_reason = json. get "finish_reason"
+    finish-reason = json. get "finish_reason"
 
 
 class ChatCompletion:
@@ -928,10 +928,10 @@ class ChatCompletion:
   */
   usage/Usage?
 
-  constructor.from_json json/Map:
+  constructor.from-json json/Map:
     id = json["id"]
     object = json["object"]
     created = json["created"]
     model = json["model"]
-    choices = json["choices"].map: ChatChoice.from_json it
-    usage = json.contains "usage" ? Usage.from_json json["usage"]: null
+    choices = json["choices"].map: ChatChoice.from-json it
+    usage = json.contains "usage" ? Usage.from-json json["usage"]: null
